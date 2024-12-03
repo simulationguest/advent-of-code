@@ -1,12 +1,16 @@
 fn main() {
     let input = include_str!("./input.txt");
     let (mut left, mut right) = parse_input(input);
+
     left.sort();
     right.sort();
-    let mut total = 0;
-    for (lhs, rhs) in left.iter().zip(right.iter()) {
-        total += (lhs - rhs).abs();
-    }
+
+    let total: u32 = left
+        .iter()
+        .zip(right.iter())
+        .map(|(lhs, rhs)| (lhs.abs_diff(*rhs)))
+        .sum();
+
     println!("Total: {total}");
 }
 
