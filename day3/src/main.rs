@@ -19,15 +19,13 @@ fn main() {
     println!("Partial sum: {partial_sum}");
 }
 
-
 // pass the regex to the function to avoid reinitializing it on every call
 fn sum_muls(re: &Regex, m: &str) -> i32 {
-    re 
-                .captures_iter(m)
-                .map(|cap| {
-                    let a: i32 = cap[1].parse().unwrap();
-                    let b: i32 = cap[2].parse().unwrap();
-                    a * b
-                })
-                .sum()
+    re.captures_iter(m)
+        .map(|cap| {
+            let a: i32 = cap[1].parse().unwrap();
+            let b: i32 = cap[2].parse().unwrap();
+            a * b
+        })
+        .sum()
 }
