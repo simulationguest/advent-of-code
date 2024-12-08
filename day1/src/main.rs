@@ -10,8 +10,15 @@ fn main() {
         .zip(right.iter())
         .map(|(lhs, rhs)| (lhs.abs_diff(*rhs)))
         .sum();
-
     println!("Total: {total}");
+
+    // part two
+    let mut similarity_score = 0;
+    for i in left.iter() {
+        let count = right.iter().filter(|&&n| n == *i).count() as i32;
+        similarity_score += i * count;
+    }
+    println!("Similarity score: {similarity_score}");
 }
 
 fn parse_input(input: &str) -> (Vec<i32>, Vec<i32>) {
