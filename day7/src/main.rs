@@ -1,43 +1,93 @@
 fn main() {
     let input = include_str!("./input.txt");
-    let mut sum_of_true_equations = 0;
+    let mut q1_sum = 0;
+    let mut q2_sum = 0;
 
     for line in input.trim().lines() {
-        let (result, equation) = parse_line(line);
+        let equation = parse_line(line);
 
-        let no_permutations = 2u64.pow((equation.len() as u32) - 1);
+        if q1(&equation) {
+            q1_sum += equation.result;
+        }
 
-        for i in 0..no_permutations {
-            let mut sum = equation[0];
-            let mut i = i;
-            for j in 1..equation.len() {
-                if i & 1 == 0 {
-                    sum += equation[j];
-                } else {
-                    sum *= equation[j];
-                }
-                i >>= 1;
-            }
-            if sum == result {
-                sum_of_true_equations += result;
-                break;
-            }
+        if q2(&equation) {
+            q2_sum += equation.result;
         }
     }
 
-    println!("Sum of true equations: {sum_of_true_equations}");
+    println!("Q1: {q1_sum}");
+    println!("Q2: {q2_sum}");
 }
 
-fn parse_line(line: &str) -> (u64, Vec<u64>) {
-    let (result, equation) = line.split_once(':').unwrap();
+struct Equation {
+    result: u64,
+    params: Vec<u64>,
+}
+
+fn q1(equation: &Equation) -> bool {
+    let params = &equation.params;
+    let no_permutations = 2u64.pow((params.len() as u32) - 1);
+
+    for i in 0..no_permutations {
+        let mut sum = params[0];
+        let mut i = i;
+        for j in 1..params.len() {
+            if i & 1 == 0 {
+                sum += params[j];
+            } else {
+                sum *= params[j];
+            }
+            i >>= 1;
+        }
+        if sum == equation.result {
+            return true;
+        }
+    }
+    false
+}
+
+fn q2(equation: &Equation) -> bool {
+    let params = &equation.params;
+    let no_permutations = 3u64.pow((params.len() as u32) - 1);
+
+    for i in 0..no_permutations {
+        let mut sum = params[0];
+        let mut i = i;
+        for j in 1..params.len() {
+            let n = i % 3;
+            match n {
+                0 => sum += params[j],
+                1 => sum *= params[j],
+                _ => sum = concat(sum, params[j]),
+            }
+            i /= 3;
+        }
+        if sum == equation.result {
+            return true;
+        }
+    }
+    false
+}
+
+fn concat(a: u64, b: u64) -> u64 {
+    fn number_of_digits(n: u64) -> u32 {
+        n.checked_ilog10().unwrap_or(0) + 1
+    }
+
+    let n = number_of_digits(b);
+    a * 10u64.pow(n) + b
+}
+
+fn parse_line(line: &str) -> Equation {
+    let (result, params) = line.split_once(':').unwrap();
 
     let result = result.parse().unwrap();
 
-    let equation: Vec<_> = equation
+    let params: Vec<_> = params
         .split(' ')
         .skip(1)
         .map(|s| s.parse().unwrap())
         .collect();
 
-    (result, equation)
+    Equation { result, params }
 }
