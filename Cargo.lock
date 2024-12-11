@@ -16,6 +16,10 @@ name = "day1"
 version = "0.1.0"
 
 [[package]]
+name = "day10"
+version = "0.1.0"
+
+[[package]]
 name = "day2"
 version = "0.1.0"
 
@@ -25,6 +29,18 @@ version = "0.1.0"
 dependencies = [
  "regex",
 ]
+
+[[package]]
+name = "day5"
+version = "0.1.0"
+
+[[package]]
+name = "day6"
+version = "0.1.0"
+
+[[package]]
+name = "day7"
+version = "0.1.0"
 
 [[package]]
 name = "memchr"
