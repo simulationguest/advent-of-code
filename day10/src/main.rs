@@ -49,44 +49,43 @@ fn main() {
     let input = include_str!("./input.txt");
     let grid = Grid::new(input);
 
-    let mut count = 0;
+    let mut q1 = 0;
+    let mut q2 = 0;
     for (y, row) in grid.values.iter().enumerate() {
         for (x, &cell) in row.iter().enumerate() {
             if cell == 0 {
-                count += find_trails(&grid, (x, y));
+                let (ends, routes) = find_trails(&grid, (x, y));
+                q1 += ends;
+                q2 += routes;
             }
         }
     }
-    println!("Total: {count}")
+    println!("Q1: {q1}\nQ2: {q2}");
 }
 
-fn find_trails(grid: &Grid, start: Point) -> i32 {
-    let mut visited: HashSet<Point> = HashSet::new();
+fn find_trails(grid: &Grid, start: Point) -> (usize, usize) {
     let mut count = 0;
     let mut queue = VecDeque::from([start]);
+    let mut ends = HashSet::new();
 
     while !queue.is_empty() {
         let current = queue.pop_front().unwrap();
         let current_value = grid.get(current);
 
-        if visited.contains(&current) {
-            continue;
-        }
-        visited.insert(current);
-
         if current_value == 9 {
             count += 1;
+            ends.insert(current);
             continue;
         }
 
         let neighbors = grid.neighbors(current);
 
         for neighbor in neighbors {
-            if visited.contains(&neighbor) || grid.get(neighbor) != current_value + 1 {
+            if grid.get(neighbor) != current_value + 1 {
                 continue;
             }
             queue.push_back(neighbor);
         }
     }
-    count
+    (ends.len(), count)
 }
