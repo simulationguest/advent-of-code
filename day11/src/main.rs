@@ -1,36 +1,55 @@
+use std::collections::HashMap;
+
 fn main() {
     let mut numbers = parse_input("28 4 3179 96938 0 6617406 490 816207");
-    let mut blank = Vec::new();
-    for _ in 0..25 {
+    let mut blank = HashMap::new();
+
+    for _ in 0..75 {
         (numbers, blank) = rules(numbers, blank);
     }
-    println!("Q1: {}", numbers.len());
+    let sum = numbers.values().sum::<u64>();
+    println!("Answer: {sum}");
 }
 
-fn rules(mut input: Vec<usize>, mut output: Vec<usize>) -> (Vec<usize>, Vec<usize>) {
-    for &n in &input {
+type Map = HashMap<u64, u64>;
+
+#[inline]
+fn add(map: &mut Map, n: u64, count: u64) {
+    map.entry(n).and_modify(|c| *c += count).or_insert(count);
+}
+
+fn rules(mut input: Map, mut output: Map) -> (Map, Map) {
+    for (n, count) in input.drain() {
         if n == 0 {
-            output.push(1);
+            add(&mut output, 1, count);
             continue;
         }
+
         let digits = count_digits(n);
         if digits % 2 == 0 {
-            let upper = n / 10usize.pow(digits as u32 / 2);
-            let lower = n % 10usize.pow(digits as u32 / 2);
-            output.push(upper);
-            output.push(lower);
+            let upper = n / 10u64.pow(digits / 2);
+            let lower = n % 10u64.pow(digits / 2);
+            add(&mut output, upper, count);
+            add(&mut output, lower, count);
             continue;
         }
-        output.push(n * 2024)
+
+        add(&mut output, n * 2024, count);
     }
-    input.clear();
+
     (output, input)
 }
 
-fn count_digits(n: usize) -> usize {
-    1 + n.checked_ilog10().unwrap_or_default() as usize
+#[inline]
+fn count_digits(n: u64) -> u32 {
+    1 + n.checked_ilog10().unwrap_or_default()
 }
 
-fn parse_input(s: &str) -> Vec<usize> {
-    s.split_whitespace().map(|s| s.parse().unwrap()).collect()
+fn parse_input(s: &str) -> Map {
+    s.split_whitespace()
+        .map(|s| s.parse().unwrap())
+        .fold(Map::new(), |mut map, n| {
+            add(&mut map, n, 1);
+            map
+        })
 }
